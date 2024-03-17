@@ -1,6 +1,9 @@
 const express = require('express');
+const morgan = require('morgan');
 const connectToDatabase = require ('./config/dbConnect.js');
-const routes = require ('./routes/index.js')
+const routes = require ('./routes/index.js');
+const errorHandler = require('./middlewares/errorHandler.js');
+const notFoundHandler = require('./middlewares/notFoundHandler.js');
 
 async function startConnection(){
     try {
@@ -20,6 +23,10 @@ async function startConnection(){
 startConnection();
 
 const app = express();
+app.use(morgan('dev'));
 routes(app);
+
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 module.exports = app;

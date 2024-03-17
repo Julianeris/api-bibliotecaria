@@ -1,4 +1,3 @@
-const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const express = require('express');
 
@@ -11,12 +10,10 @@ const literyGenre = require ('./literaryGenre.js');
 const bookRate = require ('./rate.js');
 const status = require ('./status.js');
 
-
 const routes = (app) => {
     app.route('/').get((req, res) => res.status(200).send('Api-Bibliotecaria'));
     app.use(express.json(), book, author, bookPublisher, bookSeries, literyGenre, bookRate, status ); //aqui adiciono todas as rotas (livros/editores e etc)
     
-    app.use(morgan('dev'));
     app.use(bodyParser.urlencoded({ extended: false }));
     app.use(bodyParser.json());
 };

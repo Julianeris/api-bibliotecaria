@@ -1,54 +1,64 @@
-const  { bookSeries } =  require ('../models/bookSeriesModels.js')
+const NotFound = require('../errors/notFoundError.js');
+const  { bookSeries } =  require ('../models/bookSeriesModels.js');
 
 class BookSeriesController {
     
-    static async listBookSeries(req, res) {
+    static listBookSeries = async(req, res, next) => {
         try{
             const listBookSeries = await bookSeries.find({});
             res.status(200).json(listBookSeries);
         } catch (error) {
-            res.status(500).json({message:`${erro.message} - Request failed`});    
-        }        
+            next(error);
+        }
     };
 
-    static async listBookSerieById(req, res) {
+    static listBookSerieById = async(req, res, next) => {
         try{
             const id = req.params.id;
             const bookSerieFound = await bookSeries.findById(id);
             res.status(200).json(bookSerieFound);
+            if(!bookSerieFound){
+                next(new NotFound)('Book Serie not found!');
+            }
         } catch (error) {
-            res.status(500).json({message:`${erro.message} - Request failed`});    
-        }        
-    };
-
-    static async registerBookSerie(req, res){
-        try{
-            const newBookSerie = await bookSeries.create(req.body);
-            res.status(201).json({ message:'Successfully created', bookSeries: bookSeries });
-        } catch (erro) {
-            res.status(500).json({message:`${erro.message} - Failed to register book serie`});
+            next(error);
         }
     };
 
-    static async updateBookSerie(req, res) {
+    static registerBookSerie = async(req, res, next) => {
+        try{
+            await bookSeries.create(req.body);
+            res.status(201).json({ message:'Successfully created', bookSeries: bookSeries });
+        } catch (erro) {
+            next(erro);
+        }
+    };
+
+    static updateBookSerie = async(req, res, next) => {
         try{
             const id = req.params.id;
             await bookSeries.findByIdAndUpdate(id, req.body);
             res.status(200).json({message: 'Updated book serie' });
+            if(!id){
+                next(new NotFound)('Book Serie not found!');
+            }
         } catch (error) {
-            res.status(500).json({message:`${erro.message} - Failed to uptade book serie`});    
+            next(error);
         }        
     };
     
-    static async deleteBookSerieById(req, res) {
+    static deleteBookSerieById = async(req, res, next) => {
         try{
             const id = req.params.id;
             await bookSeries.findByIdAndDelete(id);
             res.status(200).json({message: 'Book serie deleted successfully'});
+            if(!id){
+                next(new NotFound)('Book Serie not found!');
+            }
         } catch (error) {
-            res.status(500).json({message:`${erro.message} - Book serie deletion failed`});    
+            next(error);
         }        
     };
-};
+}
 
-module.exports = BookSeriesController
+module.exports = BookSeriesController;

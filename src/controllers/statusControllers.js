@@ -1,16 +1,21 @@
-const  { status } =  require ('../models/rateModels.js')
+const NotFound = require('../errors/notFoundError.js');
+const  { status } =  require ('../models/statusModels.js');
 
 class StatusController {
     
-    static async updateStatus(req, res) {
+    static updateStatus = async(req, res, next) => {
         try{
             const id = req.params.id;
-            await status.findByIdAndUpdate(id, req.body);
+            await status.findByIdAndUpdate(id, req.body, { runValidators: true });
             res.status(200).json({message: 'Status updated' });
+            if(!id){
+                console.log(NotFound);
+                next(new NotFound)('Status not found!');
+            }
         } catch (error) {
-            res.status(500).json({message:`${erro.message} - Failed to uptade status`});    
+            next(error);
         }        
     };
-};
+}
 
 module.exports = StatusController;

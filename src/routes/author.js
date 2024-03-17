@@ -4,6 +4,7 @@ const AuthorController = require('../controllers/authorControllers.js');
 const routes = express.Router();
 
 routes.get('/author', AuthorController.listAuthors);
+routes.get('/author/search', AuthorController.listAuthorBySearch);
 routes.get('/author/:id', AuthorController.listAuthorById);
 routes.post('/author', AuthorController.registerAuthor);
 routes.put('/author/:id', AuthorController.updateAuthor);

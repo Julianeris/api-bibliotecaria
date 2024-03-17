@@ -1,16 +1,20 @@
-const  { bookRate } =  require ('../models/rateModels.js')
+const NotFound = require('../errors/notFoundError.js');
+const  { bookRate } =  require ('../models/rateModels.js');
 
 class RateController {
     
-    static async updateRate(req, res) {
+    static updateRate = async(req, res, next) => {
         try{
             const id = req.params.id;
-            await bookRate.findByIdAndUpdate(id, req.body);
+            await bookRate.findByIdAndUpdate(id, req.body, {runValidators: true});
             res.status(200).json({message: 'Updated rate' });
+            if(!id){
+                next(new NotFound)('Book not found!');
+            }
         } catch (error) {
-            res.status(500).json({message:`${erro.message} - Failed to uptade rate`});    
+            next(error);
         }        
     };
-};
+}
 
 module.exports = RateController;

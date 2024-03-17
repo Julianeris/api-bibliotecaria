@@ -1,54 +1,91 @@
-const  { author } =  require ('../models/authorModels.js')
+const NotFound = require('../errors/notFoundError.js');
+const  { author } =  require ('../models/authorModels.js');
 
 class AuthorController {
     
-    static async listAuthors(req, res) {
+    static listAuthors = async(req, res, next) => {
         try{
             const listAuthors = await author.find({});
             res.status(200).json(listAuthors);
         } catch (error) {
-            res.status(500).json({message:`${erro.message} - Request failed`});    
+            next(error);
         }        
     };
 
-    static async listAuthorById(req, res) {
+    static listAuthorById = async(req, res, next) => {
         try{
             const id = req.params.id;
             const authorFound = await author.findById(id);
             res.status(200).json(authorFound);
+            if(!authorFound){
+                next(new NotFound)('Author not found!');
+            }
         } catch (error) {
-            res.status(500).json({message:`${erro.message} - Request failed`});    
+            next(error);
         }        
     };
 
-    static async registerAuthor(req, res){
+    static registerAuthor = async(req, res, next) => {
         try{
             const newAuthor = await author.create(req.body);
             res.status(201).json({ message:'Successfully created', author: newAuthor });
         } catch (erro) {
-            res.status(500).json({message:`${erro.message} - Failed to register author`});
+            next(erro);
         }
     };
 
-    static async updateAuthor(req, res) {
+    static updateAuthor = async(req, res, next) => {
         try{
             const id = req.params.id;
             await author.findByIdAndUpdate(id, req.body);
             res.status(200).json({message: 'Updated author' });
+            if(!author){
+                next(new NotFound)('Auhtor not found!');
+            }
         } catch (error) {
-            res.status(500).json({message:`${erro.message} - Failed to updated author`});    
+            next(error);
         }        
     };
     
-    static async deleteAuthorById(req, res) {
+    static deleteAuthorById = async(req, res, next) => {
         try{
             const id = req.params.id;
             await author.findByIdAndDelete(id);
             res.status(200).json({message: 'Author successfully deleted'});
+            if(!id){
+                next(new NotFound)('Author not found!');
+            }
         } catch (error) {
-            res.status(500).json({message:`${erro.message} - Author deletion failed`});    
+            next(error);
         }        
     };
-};
+
+    static listAuthorBySearch = async (req, res, next) => {
+        try {
+            const search = await searchParams(req.query);
+    
+            if (search !== null) {
+                const resultAuthors = await author
+                    .find(search);
+    
+                res.status(200).send(resultAuthors);
+            } else {
+                res.status(200).send([]);
+            }
+        } catch (error) {
+            next(error);
+        }
+    };
+}
+    
+async function searchParams(params) {
+    const { authorName } = params;
+    
+    let search = {};
+    
+    if (authorName) search.authorName = { $regex: authorName, $options: 'i' };
+
+    return search;
+}
 
 module.exports = AuthorController;

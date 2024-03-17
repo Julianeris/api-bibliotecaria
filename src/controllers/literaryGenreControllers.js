@@ -1,54 +1,64 @@
-const  { literaryGenre } =  require ('../models/literaryGenreModels.js')
+const NotFound = require('../errors/notFoundError.js');
+const  { literaryGenre } =  require ('../models/literaryGenreModels.js');
 
 class LiteraryGenreController {
     
-    static async listLiteraryGenre(req, res) {
+    static listLiteraryGenre = async(req, res, next) => {
         try{
             const listLiteraryGenre = await literaryGenre.find({});
             res.status(200).json(listLiteraryGenre);
         } catch (error) {
-            res.status(500).json({message:`${erro.message} - Request failed`});    
+            next(error);
         }        
     };
 
-    static async listLiteraryGenreById(req, res) {
+    static listLiteraryGenreById = async(req, res, next) => {
         try{
             const id = req.params.id;
             const literaryGenreFound = await literaryGenre.findById(id);
             res.status(200).json(literaryGenreFound);
+            if(!literaryGenreFound){
+                next(new NotFound)('Literary genre not found!');
+            }
         } catch (error) {
-            res.status(500).json({message:`${erro.message} - Request failed`});    
-        }        
-    };
-
-    static async registerLiteraryGenre(req, res){
-        try{
-            const newLiteraryGenre = await literaryGenre.create(req.body);
-            res.status(201).json({ message:'Successfully created', literaryGenre:literaryGenre });
-        } catch (erro) {
-            res.status(500).json({message:`${erro.message} - Failed to register a literary genre`});
+            next(error);
         }
     };
 
-    static async updateLiteraryGenre(req, res) {
+    static registerLiteraryGenre = async(req, res, next) => {
+        try{
+            await literaryGenre.create(req.body);
+            res.status(201).json({ message:'Successfully created', literaryGenre:literaryGenre });
+        } catch (erro) {
+            next(erro);
+        }
+    };
+
+    static updateLiteraryGenre = async(req, res, next) => {
         try{
             const id = req.params.id;
             await literaryGenre.findByIdAndUpdate(id, req.body);
             res.status(200).json({message: 'Updated literary genre' });
+            if(!id){
+                next(new NotFound)('Literary genre not found!');
+            }
         } catch (error) {
-            res.status(500).json({message:`${erro.message} - Failed to uptade literary genre`});    
+            next(error);
         }        
     };
     
-    static async deleteLiteraryGenreById(req, res) {
+    static deleteLiteraryGenreById = async(req, res, next) => {
         try{
             const id = req.params.id;
             await literaryGenre.findByIdAndDelete(id);
             res.status(200).json({message: 'Literary genre deleted successfully'});
+            if(!id){
+                next(new NotFound)('Literary genre not found!');
+            }
         } catch (error) {
-            res.status(500).json({message:`${erro.message} - Literary genre deletion failed`});    
+            next(error);
         }        
     };
-};
+}
 
 module.exports = LiteraryGenreController;

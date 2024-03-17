@@ -4,6 +4,7 @@ const BookControllers = require('../controllers/bookControllers');
 const routes = express.Router();
 
 routes.get('/book', BookControllers.listBooks);
+routes.get('/book/search', BookControllers.listBooksBySearch);
 routes.get('/book/:id', BookControllers.listBookById);
 routes.post('/book', BookControllers.registerBook);
 routes.put('/book/:id', BookControllers.updateBook);
