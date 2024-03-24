@@ -5,10 +5,11 @@ class AuthorController {
     
     static listAuthors = async(req, res, next) => {
         try{
-            const listAuthors = await author.find({});
-            res.status(200).json(listAuthors);
+            const authorsResult =  author.find();
+            req.result = authorsResult;
+            next();
         } catch (error) {
-            next(error);
+            res.status(500).json({ message: 'Servidor error' });
         }        
     };
 
@@ -59,33 +60,6 @@ class AuthorController {
             next(error);
         }        
     };
-
-    static listAuthorBySearch = async (req, res, next) => {
-        try {
-            const search = await searchParams(req.query);
-    
-            if (search !== null) {
-                const resultAuthors = await author
-                    .find(search);
-    
-                res.status(200).send(resultAuthors);
-            } else {
-                res.status(200).send([]);
-            }
-        } catch (error) {
-            next(error);
-        }
-    };
-}
-    
-async function searchParams(params) {
-    const { authorName } = params;
-    
-    let search = {};
-    
-    if (authorName) search.authorName = { $regex: authorName, $options: 'i' };
-
-    return search;
 }
 
 module.exports = AuthorController;

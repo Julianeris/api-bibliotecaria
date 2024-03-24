@@ -59,33 +59,6 @@ class BookPublisherController {
             next(error);
         }        
     };
-
-    static listBookPublishersBySearch = async (req, res, next) => {
-        try {
-            const search = await searchParams(req.query);
-    
-            if (search !== null) {
-                const resultBookPublishers = await bookPublisher
-                    .find(search);
-    
-                res.status(200).send(resultBookPublishers);
-            } else {
-                res.status(200).send([]);
-            }
-        } catch (error) {
-            next(error);
-        }
-    };
-}
-    
-async function searchParams(params) {
-    const { bookPublisherName } = params;
-    
-    let search = {};
-        
-    if (bookPublisherName) search.bookPublisherName = { $regex: bookPublisherName, $options: 'i' };
-
-    return search;
 }
 
 module.exports = BookPublisherController;

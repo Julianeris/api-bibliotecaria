@@ -7,8 +7,9 @@ class BookController {
         
     static listBooks = async(req, res, next) => {
         try{
-            const listBooks = await book.find({});
-            res.status(200).json(listBooks);
+            const listBooks =  book.find();
+            req.result = listBooks;
+            next();
         } catch (error) {
             next(error);
         }        
@@ -68,37 +69,5 @@ class BookController {
             next(error);
         }        
     };
-
-    static listBooksBySearch = async (req, res, next) => {
-        try {
-            const search = await searchParams(req.query);
-    
-            if (search !== null) {
-                const resultBooks = await book
-                    .find(search);
-    
-                res.status(200).send(resultBooks);
-            } else {
-                res.status(200).send([]);
-            }
-        } catch (error) {
-            next(error);
-        }
-    };
 }
-    
-async function searchParams(params) {
-    const { title, minPages, maxPages } = params;
-    
-    let search = {};
-    
-    if (title) search.title = { $regex: title, $options: 'i' };
-    if (minPages || maxPages) search.numberOfPages = {};
-    if (minPages) search.numberOfPages.$gte = minPages;
-    if (maxPages) search.numberOfPages.$lte = maxPages;
-
-    return search;
-}
-
-
 module.exports = BookController;
